@@ -1,0 +1,165 @@
+
+# Sniper Tool User Manual
+quick run:
+
+Step-by-Step Commands
+
+Activate the virtual environment (if you haven't already):
+
+Linux/macOS: source venv/bin/activate
+
+Windows (Command Prompt): venv\Scripts\activate.bat
+
+Windows (PowerShell): venv\Scripts\Activate.ps1
+
+Run the Sniper tool with a basic example:
+python sniper.py testing_apps/diva-beta.apk
+
+Deactivate the virtual environment when you're finished:
+deactivate
+
+
+
+## 1. Introduction
+
+
+
+Sniper is a command-line interface (CLI) tool designed for analyzing Android Application Packages (APKs). It helps in identifying potential security vulnerabilities, sensitive information, and other relevant details within an APK file. The tool leverages various static analysis techniques and integrates with other utilities like `jadx` for decompilation.
+
+## 2. Setup
+
+To run the Sniper tool, it is highly recommended to use a Python virtual environment to manage dependencies and avoid conflicts with your system's Python packages.
+
+### 2.1. Create and Activate a Virtual Environment
+
+1.  **Navigate to the project directory:**
+    ```bash
+    cd /workspaces/spyhunt-v1/sih_sniper/sniper
+    ```
+
+2.  **Create a virtual environment (if you don't have one already):**
+    ```bash
+    python3 -m venv venv
+    ```
+    This command creates a directory named `venv` in your project folder, containing the Python executable and `pip` for this isolated environment.
+
+3.  **Activate the virtual environment:**
+    *   **On Linux/macOS:**
+        ```bash
+        source venv/bin/activate
+        ```
+    *   **On Windows (Command Prompt):**
+        ```bash
+        venv\Scripts\activate.bat
+        ```
+    *   **On Windows (PowerShell):**
+        ```bash
+        venv\Scripts\Activate.ps1
+        ```
+    You will see `(venv)` prepended to your terminal prompt, indicating that the virtual environment is active.
+
+### 2.2. Install Dependencies
+
+With the virtual environment activated, install all necessary Python packages using the `requirements.txt` file:
+
+```bash
+pip install -r requirements.txt
+```
+
+This will install all the required libraries, including `colorama`, `beautifulsoup4`, `lxml`, `requests`, `pyaxmlparser`, `yara-python`, `Pillow`, `reportlab`, `frida`, `androguard`, and others.
+
+## 3. How to Run Sniper
+
+The Sniper tool is executed via the `sniper.py` script. It requires an APK file as input and offers several options to customize the analysis and output.
+
+### 3.1. Basic Usage
+
+To run Sniper with default settings, simply provide the path to the APK file:
+
+```bash
+python sniper.py <path_to_apk_file>
+```
+
+**Example:**
+
+```bash
+python sniper.py testing_apps/diva-beta.apk
+```
+
+### 3.2. Command-Line Options
+
+Sniper provides the following command-line options:
+
+*   **`--output-dir <directory>` / `-o <directory>`:**
+    Specifies the directory where all analysis results and reports will be saved. If not provided, a default directory (e.g., `reports/`) might be used.
+    **Example:**
+    ```bash
+    python sniper.py testing_apps/diva-beta.apk -o my_analysis_results
+    ```
+
+*   **`--no-report`:**
+    If this flag is present, Sniper will perform the analysis but will not generate a PDF report.
+    **Example:**
+    ```bash
+    python sniper.py testing_apps/diva-beta.apk --no-report
+    ```
+
+*   **`--verbose` / `-v`:**
+    Enables verbose output, providing more detailed information during the analysis process.
+    **Example:**
+    ```bash
+    python sniper.py testing_apps/diva-beta.apk -v
+    ```
+
+*   **`--help`:**
+    Displays the help message with all available options and their descriptions.
+    **Example:**
+    ```bash
+    python sniper.py --help
+    ```
+
+### 3.3. Full Example
+
+To run a comprehensive analysis on `smartplug.apk`, save the results in a custom directory, and enable verbose output:
+
+```bash
+python sniper.py testing_apps/smartplug.apk -o smartplug_report -v
+```
+
+## 4. Features and Functionality
+
+Sniper performs various static analysis checks on the provided APK:
+
+*   **APK Information Extraction:** Extracts basic information about the APK, such as package name, version, permissions, and activities.
+*   **Sensitive Information Detection:** Scans for hardcoded sensitive data like API keys, URLs, email addresses, and other patterns using predefined rules (likely from `static_tools/sensitive_info_extractor.py`).
+*   **Android Manifest Analysis:** Analyzes the `AndroidManifest.xml` for potential misconfigurations or security issues (likely using `static_tools/scan_android_manifest_root.py`).
+*   **Decompilation (via Jadx):** Utilizes the `jadx` tool (located in `static_tools/jadx/`) to decompile the APK's DEX files into Java source code, which can then be further analyzed.
+*   **YARA Rule Scanning:** Applies YARA rules (if configured) to identify malware families or specific patterns within the APK's files.
+*   **Report Generation:** Generates a comprehensive PDF report summarizing all findings (unless `--no-report` is specified).
+
+## 5. Output
+
+By default, Sniper will create a directory (either `reports/` or the one specified by `--output-dir`) containing:
+
+*   **Decompiled Source Code:** The decompiled Java source code from the APK.
+*   **Analysis Logs:** Detailed logs of the analysis process.
+*   **PDF Report:** A human-readable PDF report summarizing all identified issues, sensitive information, and APK details.
+*   **Other Intermediate Files:** Any other files generated during the analysis.
+
+## 6. Troubleshooting
+
+*   **`python: command not found` or `python3: command not found`:** Ensure Python is installed and correctly added to your system's PATH. You might need to use `python` instead of `python3` or vice-versa depending on your system configuration.
+*   **`pip: command not found`:** Ensure `pip` is installed. It usually comes with Python. If not, you might need to install it separately.
+*   **`ModuleNotFoundError`:** This indicates that a required Python package is missing. Make sure your virtual environment is activated and you have run `pip install -r requirements.txt`.
+*   **`Permission Denied`:** If you encounter permission errors, ensure you have the necessary read/write permissions for the project directory and the APK file. Avoid running the tool with `sudo` unless absolutely necessary and you understand the implications.
+*   **Jadx Issues:** If Jadx-related errors occur, ensure that the `jadx` executable within `static_tools/jadx/bin/` has execute permissions. You might need to run `chmod +x static_tools/jadx/bin/jadx`.
+
+## 7. Deactivating the Virtual Environment
+
+Once you are done using the Sniper tool, you can deactivate the virtual environment by simply typing:
+
+```bash
+deactivate
+```
+
+Your terminal prompt will return to its normal state.
